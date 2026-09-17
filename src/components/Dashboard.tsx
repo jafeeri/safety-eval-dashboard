@@ -36,6 +36,17 @@ const Dashboard: React.FC = () => {
     reader.readAsText(file);
   }, []);
 
+  const loadSample = useCallback(async () => {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}sample-evaluations.json`);
+      const data = await res.json();
+      setEvaluations(Array.isArray(data) ? data : [data]);
+      setIsLoaded(true);
+    } catch (err) {
+      console.error('Failed to load sample data:', err);
+    }
+  }, []);
+
   const severityCounts: SeverityCount[] = React.useMemo(() => {
     const counts: Record<string, number> = {};
     evaluations.forEach((e) => {
@@ -72,10 +83,18 @@ const Dashboard: React.FC = () => {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white mb-4">Safety Eval Dashboard</h1>
           <p className="text-gray-400 mb-8">Upload evaluation results to get started</p>
-          <label className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
-            Upload Evaluation JSON
-            <input type="file" accept=".json" onChange={handleFileUpload} className="hidden" />
-          </label>
+          <div className="flex items-center justify-center gap-3">
+            <label className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
+              Upload Evaluation JSON
+              <input type="file" accept=".json" onChange={handleFileUpload} className="hidden" />
+            </label>
+            <button
+              onClick={loadSample}
+              className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors border border-gray-700"
+            >
+              Load sample data
+            </button>
+          </div>
         </div>
       </div>
     );
